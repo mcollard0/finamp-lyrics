@@ -99,3 +99,9 @@ version requires corresponding assemblies and compatibility testing.
 Future checks can be disabled immediately using the plugin's Enable checkbox. A currently active Python lookup may finish. Removing the plugin DLL and restarting the pinned server uninstalls the trigger while preserving its cached lyrics. Changing server versions requires rebuilding and testing the plugin against the intended version.
 
 New lyric files do not force Finamp to invalidate metadata already held in memory. Prefetch provides an earlier opportunity to fetch, but the first metadata response still returns promptly and may precede publication. Newly fetched lyrics may become visible after Finamp reloads the track. Offline playback without server requests cannot trigger the server plugin.
+
+## Developer and releases
+
+Developer: [mcollard0](https://github.com/mcollard0). [Source and issues](https://github.com/mcollard0/finamp-lyrics). MIT licensed.
+
+See [catalog setup](CATALOG_INSTALL.md) and [release and listing steps](RELEASE.md). The repository URL described there becomes usable after a release and manifest are published.

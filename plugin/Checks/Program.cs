@@ -22,6 +22,8 @@ var config = new PluginConfiguration();
 Check(config.PythonPath == "/usr/bin/python3" && config.ScriptPath == "/var/lib/jellyfin/finamp-lyrics/lyrics_fetcher.py"
     && config.AdditionalArguments.Length == 0, "default executable, script and extra arguments");
 Check(typeof(Plugin).Assembly.GetManifestResourceNames().Contains("Jellyfin.Plugin.FinampLyrics.config.html"), "dashboard settings embedded");
+Check(typeof(Plugin).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>().Any(a => a.Key == "Developer" && a.Value == "mcollard0"), "developer metadata");
+Check(typeof(Plugin).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>().Any(a => a.Key == "RepositoryUrl" && a.Value == "https://github.com/mcollard0/finamp-lyrics"), "repository metadata");
 var route = $"/Items/{id:N}/PlaybackInfo";
 Check(TriggerPolicy.PlaybackInfoItem(route, "GET", 200, true) == id, "prefetch GET");
 Check(TriggerPolicy.PlaybackInfoItem(route, "POST", 200, true) == id, "prefetch POST");

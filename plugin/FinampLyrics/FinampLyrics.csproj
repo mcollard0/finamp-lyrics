@@ -5,13 +5,24 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>Jellyfin.Plugin.FinampLyrics</AssemblyName>
     <RootNamespace>Jellyfin.Plugin.FinampLyrics</RootNamespace>
-    <Version>1.0.0.0</Version>
+    <Version>1.0.1.0</Version>
+    <Authors>mcollard0</Authors>
+    <Company>mcollard0</Company>
+    <Description>Queue Genius lyric checks on Jellyfin music prefetch and playback.</Description>
+    <PackageProjectUrl>https://github.com/mcollard0/finamp-lyrics</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mcollard0/finamp-lyrics</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
     <JellyfinInstallDir Condition="'$(JellyfinInstallDir)' == ''">$(MSBuildThisFileDirectory)../artifacts/server-reference/usr/lib/jellyfin</JellyfinInstallDir>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PathMap>$(MSBuildProjectDirectory)=/_/FinampLyrics</PathMap>
     <AllowMissingPrunePackageData>true</AllowMissingPrunePackageData>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="config.html" />
+    <AssemblyMetadata Include="Developer" Value="mcollard0" />
+    <AssemblyMetadata Include="RepositoryUrl" Value="https://github.com/mcollard0/finamp-lyrics" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <Reference Include="MediaBrowser.Common"><HintPath>$(JellyfinInstallDir)/MediaBrowser.Common.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="MediaBrowser.Controller"><HintPath>$(JellyfinInstallDir)/MediaBrowser.Controller.dll</HintPath><Private>false</Private></Reference>

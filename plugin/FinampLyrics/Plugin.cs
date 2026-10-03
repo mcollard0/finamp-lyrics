@@ -31,7 +31,7 @@ public sealed class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
     }
     public static Plugin? Instance { get; private set; }
     public override string Name => "Finamp Lyrics";
-    public override string Description => "Queue Genius lyric checks on music metadata prefetch and playback.";
+    public override string Description => "Queue Genius lyric checks on music metadata prefetch and playback. Developed by mcollard0; source: https://github.com/mcollard0/finamp-lyrics.";
     public override Guid Id => Guid.Parse("a7d2b5ac-63af-4a71-8197-e4b4528b56c8");
     public IEnumerable<PluginPageInfo> GetPages() =>
     [new PluginPageInfo { Name = "Finamp Lyrics", EmbeddedResourcePath = "Jellyfin.Plugin.FinampLyrics.config.html" }];

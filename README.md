@@ -48,7 +48,7 @@ Limit the ranking to a user or music library by name or ID:
 
 ```bash
 python3 lyrics_fetcher.py --server-url http://localhost:8096/ \
-  --user Mcollard --library Music --top 25 --delay 3 --upload
+  --user USER_NAME --library Music --top 25 --delay 3 --upload
 ```
 
 Standalone Genius lookup, without a Jellyfin connection:
@@ -151,3 +151,7 @@ The software license does not grant rights to lyrics. No lyric samples are shipp
 ## Private configuration
 
 Copy `config.example.json` to `config.json` for the service runner. Set the credential-file location, state directory, server URL, and worker limits there; `--config` selects another file and explicit command-line options override its settings. `config.json` and credential files are ignored by Git. Keep tokens in the separate protected credential file, never in the example. The plugin exposes its own installation settings in Jellyfin; standard paths shown in this documentation are examples.
+
+## Plugin distribution
+
+Developed by [mcollard0](https://github.com/mcollard0). See [catalog installation](plugin/CATALOG_INSTALL.md) and [release preparation](plugin/RELEASE.md). This plugin build supports Jellyfin 10.11.11 on Linux; 12.x requires a separate updated build.
