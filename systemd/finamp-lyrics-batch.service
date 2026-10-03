@@ -1,0 +1,27 @@
+[Unit]
+Description=Fetch lyrics for up to 100 eligible Jellyfin music tracks
+Wants=network-online.target
+After=network-online.target jellyfin.service
+Requires=jellyfin.service
+RequiresMountsFor=/var/lib/jellyfin/finamp-lyrics
+
+[Service]
+Type=oneshot
+User=jellyfin
+Group=jellyfin
+WorkingDirectory=/var/lib/jellyfin/finamp-lyrics
+ExecStart=/usr/bin/python3 /var/lib/jellyfin/finamp-lyrics/service_runner.py --top 100 --delay 2
+TimeoutStartSec=45min
+TimeoutStopSec=20s
+KillMode=control-group
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/jellyfin/finamp-lyrics/state
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

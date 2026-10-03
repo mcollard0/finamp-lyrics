@@ -1,0 +1,11 @@
+[Unit]
+Description=Run the 100-song lyric batch daily at 2am Central time
+
+[Timer]
+OnCalendar=*-*-* 02:00:00 America/Chicago
+AccuracySec=1s
+Persistent=true
+Unit=finamp-lyrics-batch.service
+
+[Install]
+WantedBy=timers.target

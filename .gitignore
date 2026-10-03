@@ -1,0 +1,79 @@
+# Python environments and generated caches
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+# Credentials and local overrides (keep sanitized examples)
+.env
+.env.*
+!.env.example
+!.env.sample
+credentials.json
+credentials.*.json
+*.credentials.json
+secrets.json
+secrets.*.json
+cookies.txt
+cookies.*.txt
+*.pem
+*.key
+*.p12
+*.pfx
+config.local.json
+
+# Runtime state, databases, and logs
+state/
+logs/
+cache/
+*.sqlite
+*.sqlite3
+*.db
+*.sqlite-*
+*.sqlite3-*
+*.db-*
+*.log
+*.log.*
+*.jsonl
+
+# Editor and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# .NET builds and downloaded server reference assemblies
+**/bin/
+**/obj/
+plugin/artifacts/
+*.user
+*.suo
+
+# Local investigation results and downloaded lyric sample
+/*.json
+!/config.example.json
+/systemd/*results.json
+/plugin/*verification.json
+/Leftfield - Swords.txt
+lyrics/
+*.lrc
+*.elrc
+
+# Local library investigation reports
+/runtime-estimate.md
+/database-size-analysis.md
+
+# Private historical investigation
+/FEASIBILITY.md

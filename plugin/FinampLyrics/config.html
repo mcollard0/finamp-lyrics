@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html><head><title>Finamp Lyrics</title></head><body>
+<div id="finampLyricsPage" data-role="page" class="page type-interior pluginConfigurationPage">
+<div data-role="content"><div class="content-primary"><form id="finampLyricsForm">
+<h2>Finamp Lyrics</h2>
+<p>Check Genius lyrics when music metadata is prefetched or playback begins. Replace existing lyrics only when the fetched text is longer.</p>
+<div class="checkboxContainer"><label><input id="Enabled" type="checkbox" is="emby-checkbox"><span>Enable lyric checks</span></label></div>
+<div class="checkboxContainer"><label><input id="PrefetchEnabled" type="checkbox" is="emby-checkbox"><span>Check on metadata prefetch</span></label></div>
+<div class="checkboxContainer"><label><input id="PlaybackEnabled" type="checkbox" is="emby-checkbox"><span>Check on playback start</span></label></div>
+<div class="inputContainer"><label class="inputLabel" for="PythonPath">Worker executable / interpreter (absolute path)</label><input id="PythonPath" type="text" required is="emby-input"><div class="fieldDescription">Default and suggested: /usr/bin/python3</div></div>
+<div class="inputContainer"><label class="inputLabel" for="ScriptPath">Worker script (absolute path)</label><input id="ScriptPath" type="text" required is="emby-input"><div class="fieldDescription">Default and suggested: /var/lib/jellyfin/finamp-lyrics/lyrics_fetcher.py. A replacement script must support the same queue arguments.</div></div>
+<div class="inputContainer"><label class="inputLabel" for="AdditionalArguments">Additional worker arguments (one argument per line)</label><textarea id="AdditionalArguments" rows="4" is="emby-textarea"></textarea><div class="fieldDescription">Default: empty. Optional suggested argument: --retry-429 to wait and retry rate limits, up to the worker timeout. For an option with a value, put the option and value on separate lines. No shell quoting is needed. Song ID, server, state, background count, delay, minimum plays and library arguments are supplied automatically using the fields below.</div></div>
+<div class="inputContainer"><label class="inputLabel" for="ServerUrl">Jellyfin server URL</label><input id="ServerUrl" type="url" required is="emby-input"><div class="fieldDescription">Default and suggested: http://localhost:8096/</div></div>
+<div class="inputContainer"><label class="inputLabel" for="StateDirectory">Shared lyric state directory (absolute path)</label><input id="StateDirectory" type="text" required is="emby-input"><div class="fieldDescription">Default and suggested: /var/lib/jellyfin/finamp-lyrics/state</div></div>
+<div class="inputContainer"><label class="inputLabel" for="CredentialsFile">Credentials file (absolute path)</label><input id="CredentialsFile" type="text" required is="emby-input"><div class="fieldDescription">Default and suggested: /var/lib/jellyfin/finamp-lyrics/credentials.json. Must be readable by the Jellyfin service account.</div></div>
+<div class="inputContainer"><label class="inputLabel" for="WorkerTimeoutMinutes">Worker timeout (minutes)</label><input id="WorkerTimeoutMinutes" type="number" min="1" required is="emby-input"><div class="fieldDescription">Default and suggested: 15. Increase if you want longer waits during rate-limit backoff.</div></div>
+<div class="inputContainer"><label class="inputLabel" for="BackgroundCount">Background songs per trigger</label><input id="BackgroundCount" type="number" min="0" required is="emby-input"><div class="fieldDescription">Default: 3. Suggested: 3 for ordinary use, or 0 while the continuous batch worker handles background songs. The requested song is always prioritized.</div></div>
+<div class="inputContainer"><label class="inputLabel" for="MinimumPlays">Minimum background play count</label><input id="MinimumPlays" type="number" min="1" required is="emby-input"><div class="fieldDescription">Default and suggested: 2.</div></div>
+<div class="inputContainer"><label class="inputLabel" for="DelaySeconds">Seconds between Genius requests</label><input id="DelaySeconds" type="number" min="0" max="10" step="0.1" required is="emby-input"><div class="fieldDescription">Initial delay: 0.5 seconds. Increases by 0.25 per request, capped at 10. Tune with --delay-step and --max-delay in Additional worker arguments.</div></div>
+<div class="inputContainer"><label class="inputLabel" for="LibraryIds">Music library IDs (comma separated; empty means all music libraries)</label><input id="LibraryIds" type="text" is="emby-input"></div>
+<p>Worker command preview (the requested song ID is substituted on each trigger):</p>
+<pre id="CommandPreview" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
+<p>A new lyric may appear after Finamp reloads the track metadata. Genius text has no synchronized timing.</p>
+<button is="emby-button" type="submit" class="raised button-submit block"><span>Save</span></button>
+</form></div></div>
+<script>
+(function () {
+    const pluginId = 'a7d2b5ac-63af-4a71-8197-e4b4528b56c8';
+    const page = document.querySelector('#finampLyricsPage');
+    const flags = ['Enabled', 'PrefetchEnabled', 'PlaybackEnabled'];
+    const numbers = ['BackgroundCount', 'MinimumPlays', 'DelaySeconds', 'WorkerTimeoutMinutes'];
+    const paths = ['PythonPath', 'ScriptPath', 'ServerUrl', 'StateDirectory', 'CredentialsFile'];
+    const defaults = {PythonPath:'/usr/bin/python3', ScriptPath:'/var/lib/jellyfin/finamp-lyrics/lyrics_fetcher.py',
+        ServerUrl:'http://localhost:8096/', StateDirectory:'/var/lib/jellyfin/finamp-lyrics/state',
+        CredentialsFile:'/var/lib/jellyfin/finamp-lyrics/credentials.json', WorkerTimeoutMinutes:15};
+    const argumentsFromForm = () => page.querySelector('#AdditionalArguments').value.split('\n').map(x => x.trim()).filter(Boolean);
+    const reserved = ['--server-url', '--state-dir', '--priority', '--upload', '--delay', '--min-plays', '--top',
+        '--enqueue-only', '--library', '--title', '--artist', '--list', '--inspect', '--verify', '--retry', '--disk-fallback', '--help', '-h'];
+    function preview() {
+        const value = key => page.querySelector('#' + key).value;
+        const args = [value('PythonPath'), value('ScriptPath'), '--server-url', value('ServerUrl'), '--state-dir',
+            value('StateDirectory'), '--priority', '{song-id}', '--upload', '--delay', value('DelaySeconds'),
+            '--min-plays', value('MinimumPlays'), '--top', value('BackgroundCount'), ...argumentsFromForm()];
+        value('LibraryIds').split(',').map(x => x.trim()).filter(Boolean).forEach(id => args.push('--library', id));
+        page.querySelector('#CommandPreview').textContent = args.map(x => JSON.stringify(x)).join(' ');
+    }
+    page.querySelector('form').addEventListener('input', preview);
+    page.addEventListener('pageshow', function () {
+        Dashboard.showLoadingMsg();
+        ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+            flags.forEach(key => page.querySelector('#' + key).checked = config[key]);
+            numbers.forEach(key => page.querySelector('#' + key).value = config[key] ?? defaults[key]);
+            paths.forEach(key => page.querySelector('#' + key).value = config[key] ?? defaults[key]);
+            page.querySelector('#AdditionalArguments').value = (config.AdditionalArguments || []).join('\n');
+            page.querySelector('#LibraryIds').value = (config.LibraryIds || []).join(', ');
+            preview();
+            Dashboard.hideLoadingMsg();
+        }).catch(function () { Dashboard.hideLoadingMsg(); Dashboard.alert('Unable to load settings.'); });
+    });
+    page.querySelector('form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        if (argumentsFromForm().some(x => reserved.includes(x.split('=')[0]))) {
+            Dashboard.alert('Use the dedicated settings for song, server, state, delay, background count and libraries. Additional arguments cannot change the queue mode.');
+            return;
+        }
+        Dashboard.showLoadingMsg();
+        ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+            flags.forEach(key => config[key] = page.querySelector('#' + key).checked);
+            numbers.forEach(key => config[key] = Number(page.querySelector('#' + key).value));
+            paths.forEach(key => config[key] = page.querySelector('#' + key).value.trim());
+            config.AdditionalArguments = argumentsFromForm();
+            config.LibraryIds = page.querySelector('#LibraryIds').value.split(',').map(x => x.trim()).filter(Boolean);
+            return ApiClient.updatePluginConfiguration(pluginId, config);
+        }).then(Dashboard.processPluginConfigurationUpdateResult).catch(function () {
+            Dashboard.hideLoadingMsg(); Dashboard.alert('Unable to save settings.');
+        });
+    });
+})();
+</script>
+</div></body></html>

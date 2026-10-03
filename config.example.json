@@ -1,0 +1,10 @@
+{
+  "credentials_file": "/var/lib/jellyfin/finamp-lyrics/credentials.json",
+  "state_dir": "/var/lib/jellyfin/finamp-lyrics/state",
+  "server_url": "http://localhost:8096/",
+  "top": 100,
+  "delay": 0.5,
+  "delay_step": 0.25,
+  "max_delay": 10,
+  "idle_seconds": 900
+}
