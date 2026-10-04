@@ -18,7 +18,7 @@ import sqlite3
 import sys
 import time
 import unicodedata
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit
 
 import requests
 from bs4 import BeautifulSoup
@@ -177,7 +177,8 @@ class Jellyfin:
         self.base = base.rstrip("/")
         self.scope = hashlib.sha256(self.base.encode()).hexdigest()
         self.session = requests.Session()
-        self.session.headers.update({"X-Emby-Token": key, "User-Agent": "finamp-lyrics/0.1"})
+        self.session.headers.update({"Authorization": f'MediaBrowser Token="{quote(key, safe="")}", Client="finamp-lyrics", Version="0.1"',
+                                     "User-Agent": "finamp-lyrics/0.1"})
         self.user_selectors = list(users)
         self.library_selectors = list(libraries)
         self._users = self._libraries = None

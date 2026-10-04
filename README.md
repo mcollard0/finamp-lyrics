@@ -2,7 +2,7 @@
 
 A Python worker that fetches Jellyfin music lyrics from Genius, starting with a requested track and then a configurable number of the most-played eligible tracks. It fills missing lyrics and replaces existing lyrics only when the fetched lyric text is strictly longer.
 
-The plugin targets Jellyfin 10.11.11; configure your own server URL. The program uses Jellyfin's existing lyric upload API, which saves a managed lyric file and queues a metadata refresh. MP3 tags and Jellyfin's database are not edited directly.
+Separate plugin builds target Jellyfin 10.11.11 and 12.x; configure your own server URL. The program uses Jellyfin's existing lyric upload API, which saves a managed lyric file and queues a metadata refresh. MP3 tags and Jellyfin's database are not edited directly.
 
 ## Run
 
@@ -154,4 +154,4 @@ Copy `config.example.json` to `config.json` for the service runner. Set the cred
 
 ## Plugin distribution
 
-Developed by [mcollard0](https://github.com/mcollard0). See [catalog installation](plugin/CATALOG_INSTALL.md) and [release preparation](plugin/RELEASE.md). This plugin build supports Jellyfin 10.11.11 on Linux; 12.x requires a separate updated build.
+Developed by [mcollard0](https://github.com/mcollard0). See [catalog installation](plugin/CATALOG_INSTALL.md) and [release preparation](plugin/RELEASE.md). Separate Linux plugin builds support Jellyfin 10.11.11 (.NET 9) and 12.x (.NET 10). See [Jellyfin 12 upgrade testing](plugin/JF12.md).

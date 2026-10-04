@@ -19,7 +19,7 @@ void Check(bool ok, string message)
 }
 var id = Guid.NewGuid();
 var config = new PluginConfiguration();
-Check(config.PythonPath == "/usr/bin/python3" && config.ScriptPath == "/var/lib/jellyfin/finamp-lyrics/lyrics_fetcher.py"
+Check(config.PythonPath == "/usr/bin/python3" && config.ScriptPath == ""
     && config.AdditionalArguments.Length == 0, "default executable, script and extra arguments");
 Check(typeof(Plugin).Assembly.GetManifestResourceNames().Contains("Jellyfin.Plugin.FinampLyrics.config.html"), "dashboard settings embedded");
 Check(typeof(Plugin).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>().Any(a => a.Key == "Developer" && a.Value == "mcollard0"), "developer metadata");
@@ -43,6 +43,19 @@ Check(downstream && capture.Items.Single().Item1 == id, "middleware queues succe
 config.PrefetchEnabled = false;
 await new PrefetchMiddleware(_ => Task.CompletedTask, () => config).InvokeAsync(context, capture);
 Check(capture.Items.Count == 1, "disabled prefetch ignored");
+
+var activeDirectory = "/tmp/catalog/plugins/Finamp Lyrics_1.0.2.0";
+var currentWorker = activeDirectory + "/worker/lyrics_fetcher.py";
+Check(WorkerCommand.ResolveScriptPath("", activeDirectory) == currentWorker, "bundled worker follows active assembly directory");
+Check(WorkerCommand.ResolveScriptPath("/tmp/catalog/plugins/Finamp Lyrics_1.0.1.0/worker/lyrics_fetcher.py", activeDirectory) == currentWorker,
+    "old catalog worker override follows upgrade after old directory removal");
+Check(WorkerCommand.ResolveScriptPath("/srv/custom/lyrics_fetcher.py", activeDirectory) == "/srv/custom/lyrics_fetcher.py", "custom worker override preserved");
+Check(WorkerCommand.ResolveScriptPath("/elsewhere/Finamp Lyrics_1.0.1.0/worker/lyrics_fetcher.py", activeDirectory)
+    == "/elsewhere/Finamp Lyrics_1.0.1.0/worker/lyrics_fetcher.py", "other installation override preserved");
+Check(WorkerCommand.ResolveScriptPath("/tmp/catalog/plugins/Finamp Lyrics_custom/worker/lyrics_fetcher.py", activeDirectory)
+    == "/tmp/catalog/plugins/Finamp Lyrics_custom/worker/lyrics_fetcher.py", "non-version custom directory preserved");
+try { WorkerCommand.ResolveScriptPath("../worker.py", activeDirectory); Check(false, "relative override rejected"); }
+catch (InvalidOperationException) { Check(true, "relative override rejected"); }
 
 var credentials = new Dictionary<string, string> { ["GENIUS_CLIENT_ACCESS"] = "fixture-genius", ["JELLYFIN_API_KEY"] = "fixture-jellyfin" };
 config.ScriptPath = "/tmp/worker with spaces.py";

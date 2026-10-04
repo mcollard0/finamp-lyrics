@@ -73,7 +73,8 @@ class Fixture:
         if parts.netloc == "genius.com":
             assert "Authorization" not in kwargs.get("headers", {})
             return response(text='<div data-lyrics-container="true">fixture line</div>')
-        assert session_headers["X-Emby-Token"] == "secret-jellyfin"
+        assert session_headers["Authorization"] == 'MediaBrowser Token="secret-jellyfin", Client="finamp-lyrics", Version="0.1"'
+        assert "X-Emby-Token" not in session_headers
         if path == "/Users":
             return response(self.users)
         if path == "/Library/VirtualFolders":

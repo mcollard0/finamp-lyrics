@@ -1,11 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <JellyfinLine Condition="'$(JellyfinLine)' == ''">10.11</JellyfinLine>
+    <TargetFramework Condition="'$(JellyfinLine)' == '10.11'">net9.0</TargetFramework>
+    <TargetFramework Condition="'$(JellyfinLine)' == '12'">net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>Jellyfin.Plugin.FinampLyrics</AssemblyName>
     <RootNamespace>Jellyfin.Plugin.FinampLyrics</RootNamespace>
-    <Version>1.0.1.0</Version>
+    <Version Condition="'$(JellyfinLine)' == '10.11'">1.0.3.0</Version>
+    <Version Condition="'$(JellyfinLine)' == '12'">2.0.0.0</Version>
     <Authors>mcollard0</Authors>
     <Company>mcollard0</Company>
     <Description>Queue Genius lyric checks on Jellyfin music prefetch and playback.</Description>
@@ -14,7 +17,8 @@
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 
-    <JellyfinInstallDir Condition="'$(JellyfinInstallDir)' == ''">$(MSBuildThisFileDirectory)../artifacts/server-reference/usr/lib/jellyfin</JellyfinInstallDir>
+    <JellyfinInstallDir Condition="'$(JellyfinInstallDir)' == '' and '$(JellyfinLine)' == '10.11'">$(MSBuildThisFileDirectory)../artifacts/server-reference/usr/lib/jellyfin</JellyfinInstallDir>
+    <JellyfinInstallDir Condition="'$(JellyfinInstallDir)' == '' and '$(JellyfinLine)' == '12'">$(MSBuildThisFileDirectory)../artifacts/server-reference-12</JellyfinInstallDir>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PathMap>$(MSBuildProjectDirectory)=/_/FinampLyrics</PathMap>
     <AllowMissingPrunePackageData>true</AllowMissingPrunePackageData>

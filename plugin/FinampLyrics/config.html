@@ -6,13 +6,13 @@
 <p>Developed by <a href="https://github.com/mcollard0" target="_blank" rel="noopener noreferrer">mcollard0</a>.
 <a href="https://github.com/mcollard0/finamp-lyrics" target="_blank" rel="noopener noreferrer">Source and documentation</a> ·
 <a href="https://github.com/mcollard0/finamp-lyrics/issues" target="_blank" rel="noopener noreferrer">Report an issue</a> · MIT license.</p>
-<p>This release targets Jellyfin 10.11.11 on Linux. Install the Python worker and its dependencies, then configure the paths below.</p>
+<p>Separate Linux builds support Jellyfin 10.11.11 and 12.x; install the build matching your server. Install the Python worker and its dependencies, then configure the paths below.</p>
 <p>Check Genius lyrics when music metadata is prefetched or playback begins. Replace existing lyrics only when the fetched text is longer.</p>
 <div class="checkboxContainer"><label><input id="Enabled" type="checkbox" is="emby-checkbox"><span>Enable lyric checks</span></label></div>
 <div class="checkboxContainer"><label><input id="PrefetchEnabled" type="checkbox" is="emby-checkbox"><span>Check on metadata prefetch</span></label></div>
 <div class="checkboxContainer"><label><input id="PlaybackEnabled" type="checkbox" is="emby-checkbox"><span>Check on playback start</span></label></div>
 <div class="inputContainer"><label class="inputLabel" for="PythonPath">Worker executable / interpreter (absolute path)</label><input id="PythonPath" type="text" required is="emby-input"><div class="fieldDescription">Default and suggested: /usr/bin/python3</div></div>
-<div class="inputContainer"><label class="inputLabel" for="ScriptPath">Worker script (absolute path)</label><input id="ScriptPath" type="text" required is="emby-input"><div class="fieldDescription">Default and suggested: /var/lib/jellyfin/finamp-lyrics/lyrics_fetcher.py. A replacement script must support the same queue arguments.</div></div>
+<div class="inputContainer"><label class="inputLabel" for="ScriptPath">Worker script override (absolute path; optional)</label><input id="ScriptPath" type="text" is="emby-input"><div class="fieldDescription">Leave empty to use the bundled worker from the active plugin version, including after upgrades. Use an absolute path only for a separately installed worker supporting the same queue arguments.</div></div>
 <div class="inputContainer"><label class="inputLabel" for="AdditionalArguments">Additional worker arguments (one argument per line)</label><textarea id="AdditionalArguments" rows="4" is="emby-textarea"></textarea><div class="fieldDescription">Default: empty. Optional suggested argument: --retry-429 to wait and retry rate limits, up to the worker timeout. For an option with a value, put the option and value on separate lines. No shell quoting is needed. Song ID, server, state, background count, delay, minimum plays and library arguments are supplied automatically using the fields below.</div></div>
 <div class="inputContainer"><label class="inputLabel" for="ServerUrl">Jellyfin server URL</label><input id="ServerUrl" type="url" required is="emby-input"><div class="fieldDescription">Default and suggested: http://localhost:8096/</div></div>
 <div class="inputContainer"><label class="inputLabel" for="StateDirectory">Shared lyric state directory (absolute path)</label><input id="StateDirectory" type="text" required is="emby-input"><div class="fieldDescription">Default and suggested: /var/lib/jellyfin/finamp-lyrics/state</div></div>
@@ -34,7 +34,7 @@
     const flags = ['Enabled', 'PrefetchEnabled', 'PlaybackEnabled'];
     const numbers = ['BackgroundCount', 'MinimumPlays', 'DelaySeconds', 'WorkerTimeoutMinutes'];
     const paths = ['PythonPath', 'ScriptPath', 'ServerUrl', 'StateDirectory', 'CredentialsFile'];
-    const defaults = {PythonPath:'/usr/bin/python3', ScriptPath:'/var/lib/jellyfin/finamp-lyrics/lyrics_fetcher.py',
+    const defaults = {PythonPath:'/usr/bin/python3', ScriptPath:'',
         ServerUrl:'http://localhost:8096/', StateDirectory:'/var/lib/jellyfin/finamp-lyrics/state',
         CredentialsFile:'/var/lib/jellyfin/finamp-lyrics/credentials.json', WorkerTimeoutMinutes:15};
     const argumentsFromForm = () => page.querySelector('#AdditionalArguments').value.split('\n').map(x => x.trim()).filter(Boolean);
@@ -42,7 +42,7 @@
         '--enqueue-only', '--library', '--title', '--artist', '--list', '--inspect', '--verify', '--retry', '--disk-fallback', '--help', '-h'];
     function preview() {
         const value = key => page.querySelector('#' + key).value;
-        const args = [value('PythonPath'), value('ScriptPath'), '--server-url', value('ServerUrl'), '--state-dir',
+        const args = [value('PythonPath'), value('ScriptPath') || '{active-plugin}/worker/lyrics_fetcher.py', '--server-url', value('ServerUrl'), '--state-dir',
             value('StateDirectory'), '--priority', '{song-id}', '--upload', '--delay', value('DelaySeconds'),
             '--min-plays', value('MinimumPlays'), '--top', value('BackgroundCount'), ...argumentsFromForm()];
         value('LibraryIds').split(',').map(x => x.trim()).filter(Boolean).forEach(id => args.push('--library', id));

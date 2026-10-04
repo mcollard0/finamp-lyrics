@@ -10,23 +10,29 @@ The service launches a short `--enqueue-only` process for each accepted request,
 
 ## Build and checks
 
-The build targets .NET 9 and Jellyfin 10.11.11 assemblies. Supply compatible server
-reference assemblies yourself; they are not distributed in this repository.
-The following package path is an Arch Linux example and must exist locally.
+Two builds share the same C# source. Jellyfin 10.11.11 uses .NET 9 and plugin
+1.0.3.0; Jellyfin 12.x uses .NET 10 and plugin 2.0.0.0. The latter is compiled
+against 12.0 and tested on 12.0 and 12.1. Supply compatible server reference
+assemblies yourself; they are not distributed in this repository. See
+[release instructions](RELEASE.md) for extracting them from Docker images and
+building both packages. With the references in place, run from the repository root:
 
 ```bash
-mkdir -p plugin/artifacts/server-reference
-tar -xf /var/cache/pacman/pkg/jellyfin-server-10.11.11-1.1-x86_64_v4.pkg.tar.zst -C plugin/artifacts/server-reference
-DOTNET_CLI_HOME=/tmp/finamp-dotnet dotnet restore plugin/FinampLyrics/FinampLyrics.csproj --packages /tmp/finamp-nuget
-DOTNET_CLI_HOME=/tmp/finamp-dotnet dotnet build plugin/FinampLyrics/FinampLyrics.csproj -c Release --no-restore -o plugin/artifacts
-DOTNET_CLI_HOME=/tmp/finamp-dotnet dotnet restore plugin/Checks/Checks.csproj --packages /tmp/finamp-nuget
-DOTNET_CLI_HOME=/tmp/finamp-dotnet dotnet run --project plugin/Checks/Checks.csproj -c Release --no-restore
+dotnet build plugin/FinampLyrics/FinampLyrics.csproj -c Release -p:JellyfinLine=10.11 -o plugin/artifacts/build-10.11
+dotnet run --project plugin/Checks/Checks.csproj -c Release -p:JellyfinLine=10.11
+dotnet build plugin/FinampLyrics/FinampLyrics.csproj -c Release -p:JellyfinLine=12 -o plugin/artifacts/build-12
+dotnet run --project plugin/Checks/Checks.csproj -c Release -p:JellyfinLine=12
 python3 -m unittest -q test_lyrics_fetcher.py
 ```
 
 The checks cover authentication and response status, exact endpoint matching, downstream response completion, playback subscription/unsubscription, ignored non-audio events, disabled triggers, command arguments, credential handling, actual process dispatch, music/library scoping, concurrent worker promotion, and final drain behavior. The Python suite verifies cache, pacing, matching, publication, and enqueue-only behavior.
 
 ## Installation and configuration
+
+Use [catalog installation](CATALOG_INSTALL.md) for portable installation, or
+[Jellyfin 12 testing and upgrade](JF12.md) when migrating an existing server.
+The historical installer below pins an Arch installation to 10.11.11; do not
+use it to install or update a Jellyfin 12 plugin.
 
 `install.py` performs a read-only preflight by default. Activation requires root and the existing `GENIUS_CLIENT_ACCESS` and `JELLYFIN_API_KEY` environment values. The installer checks for active playback before restarting, copies the cache using SQLite's backup API, stores credentials in a file readable only by the service user, installs the plugin, restarts, and verifies the plugin is active through Jellyfin's API.
 
@@ -51,7 +57,7 @@ The settings page exposes the worker executable/interpreter, script path and add
 | Setting | Default | Example setting |
 | --- | --- | --- |
 | Worker executable / interpreter | `/usr/bin/python3` | Same |
-| Worker script | `/var/lib/jellyfin/finamp-lyrics/lyrics_fetcher.py` | Same |
+| Worker script | Empty: resolve the active bundled worker | Leave empty for catalog installs; set a stable absolute path for an external worker |
 | Additional arguments | Empty | Optionally `--retry-429` |
 | Server URL | `http://localhost:8096/` | Same |
 | Shared state | `/var/lib/jellyfin/finamp-lyrics/state` | Same; shares the continuous worker's cache |
@@ -93,10 +99,11 @@ Add `--stage-only` to copy the new DLL while playback continues. The settings ap
 The activation installer is specialized for Arch Linux Jellyfin 10.11.11 packages.
 It copies server/web files and writes a service override that pins that version.
 `--activate` can restart Jellyfin; it is not a portable installation command.
-Review package paths and service changes before use. Rebuilding for another server
-version requires corresponding assemblies and compatibility testing.
+Review package paths and service changes before use. The packaged 12.x build
+instead uses corresponding .NET 10 assemblies and the catalog/manual installation
+described above.
 
-Future checks can be disabled immediately using the plugin's Enable checkbox. A currently active Python lookup may finish. Removing the plugin DLL and restarting the pinned server uninstalls the trigger while preserving its cached lyrics. Changing server versions requires rebuilding and testing the plugin against the intended version.
+Future checks can be disabled immediately using the plugin's Enable checkbox. A currently active Python lookup may finish. Removing the plugin DLL and restarting the server uninstalls the trigger while preserving its cached lyrics. Select the package matching the server version when upgrading.
 
 New lyric files do not force Finamp to invalidate metadata already held in memory. Prefetch provides an earlier opportunity to fetch, but the first metadata response still returns promptly and may precede publication. Newly fetched lyrics may become visible after Finamp reloads the track. Offline playback without server requests cannot trigger the server plugin.
 

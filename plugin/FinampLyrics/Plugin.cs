@@ -11,7 +11,7 @@ public sealed class PluginConfiguration : BasePluginConfiguration
     public bool PrefetchEnabled { get; set; } = true;
     public bool PlaybackEnabled { get; set; } = true;
     public string PythonPath { get; set; } = "/usr/bin/python3";
-    public string ScriptPath { get; set; } = "/var/lib/jellyfin/finamp-lyrics/lyrics_fetcher.py";
+    public string ScriptPath { get; set; } = "";
     public string[] AdditionalArguments { get; set; } = [];
     public string StateDirectory { get; set; } = "/var/lib/jellyfin/finamp-lyrics/state";
     public string CredentialsFile { get; set; } = "/var/lib/jellyfin/finamp-lyrics/credentials.json";

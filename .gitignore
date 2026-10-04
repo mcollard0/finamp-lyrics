@@ -64,6 +64,7 @@ plugin/artifacts/
 # Local investigation results and downloaded lyric sample
 /*.json
 !/config.example.json
+!/manifest.json
 /systemd/*results.json
 /plugin/*verification.json
 /Leftfield - Swords.txt

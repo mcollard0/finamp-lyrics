@@ -1,10 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework>
+    <OutputType>Exe</OutputType><JellyfinLine Condition="'$(JellyfinLine)' == ''">10.11</JellyfinLine>
+    <TargetFramework Condition="'$(JellyfinLine)' == '10.11'">net9.0</TargetFramework>
+    <TargetFramework Condition="'$(JellyfinLine)' == '12'">net10.0</TargetFramework>
     <UseAppHost>false</UseAppHost>
     <Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings>
     <AllowMissingPrunePackageData>true</AllowMissingPrunePackageData>
-    <JellyfinInstallDir>$(MSBuildThisFileDirectory)../artifacts/server-reference/usr/lib/jellyfin</JellyfinInstallDir>
+    <JellyfinInstallDir Condition="'$(JellyfinInstallDir)' == '' and '$(JellyfinLine)' == '10.11'">$(MSBuildThisFileDirectory)../artifacts/server-reference/usr/lib/jellyfin</JellyfinInstallDir>
+    <JellyfinInstallDir Condition="'$(JellyfinInstallDir)' == '' and '$(JellyfinLine)' == '12'">$(MSBuildThisFileDirectory)../artifacts/server-reference-12</JellyfinInstallDir>
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />

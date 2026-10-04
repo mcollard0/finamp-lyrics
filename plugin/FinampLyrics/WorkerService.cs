@@ -15,10 +15,31 @@ namespace Jellyfin.Plugin.FinampLyrics;
 
 public static class WorkerCommand
 {
+    public static string ResolveScriptPath(string configured, string? pluginDirectory = null)
+    {
+        var active = Path.GetFullPath(pluginDirectory ?? Path.GetDirectoryName(typeof(Plugin).Assembly.Location)!);
+        var bundled = Path.Combine(active, "worker", "lyrics_fetcher.py");
+        if (string.IsNullOrWhiteSpace(configured)) return bundled;
+        if (!Path.IsPathFullyQualified(configured))
+            throw new InvalidOperationException("Worker override must be an absolute path");
+        var full = Path.GetFullPath(configured);
+        var worker = Directory.GetParent(full);
+        var previous = worker?.Parent;
+        // Recognize only our catalog layout beneath the same plugins directory.
+        // Custom workers outside that layout remain explicit overrides.
+        if (Path.GetFileName(full) == "lyrics_fetcher.py" && worker?.Name == "worker"
+            && previous?.Name.StartsWith("Finamp Lyrics_", StringComparison.Ordinal) == true
+            && Version.TryParse(previous.Name["Finamp Lyrics_".Length..], out _)
+            && previous.Parent?.FullName == Directory.GetParent(active)?.FullName)
+            return bundled;
+        return full;
+    }
+
     public static ProcessStartInfo Create(PluginConfiguration config, Guid id, bool enqueueOnly,
         IReadOnlyDictionary<string, string> credentials)
     {
-        if (!Path.IsPathFullyQualified(config.PythonPath) || !Path.IsPathFullyQualified(config.ScriptPath)
+        var script = ResolveScriptPath(config.ScriptPath);
+        if (!Path.IsPathFullyQualified(config.PythonPath) || !Path.IsPathFullyQualified(script)
             || !Path.IsPathFullyQualified(config.StateDirectory) || config.BackgroundCount < 0
             || config.MinimumPlays < 1 || config.DelaySeconds < 0 || config.DelaySeconds > 10
             || config.WorkerTimeoutMinutes < 1)
@@ -36,9 +57,9 @@ public static class WorkerCommand
         var info = new ProcessStartInfo(config.PythonPath)
         {
             UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true,
-            WorkingDirectory = Path.GetDirectoryName(config.ScriptPath)!
+            WorkingDirectory = Path.GetDirectoryName(script)!
         };
-        string[] arguments = [config.ScriptPath, "--server-url", config.ServerUrl, "--state-dir", config.StateDirectory,
+        string[] arguments = [script, "--server-url", config.ServerUrl, "--state-dir", config.StateDirectory,
             "--priority", id.ToString("N"), "--upload", "--delay", config.DelaySeconds.ToString(CultureInfo.InvariantCulture),
             "--min-plays", config.MinimumPlays.ToString(CultureInfo.InvariantCulture), "--top",
             (enqueueOnly ? 0 : config.BackgroundCount).ToString(CultureInfo.InvariantCulture)];
