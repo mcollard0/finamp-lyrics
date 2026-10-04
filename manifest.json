@@ -1,0 +1,28 @@
+[
+  {
+    "guid": "a7d2b5ac-63af-4a71-8197-e4b4528b56c8",
+    "name": "Finamp Lyrics",
+    "owner": "mcollard0",
+    "category": "Metadata",
+    "overview": "Fetch music lyrics on prefetch and playback",
+    "description": "Genius lyrics for Jellyfin music. Requires Linux, Python 3.10+, requests, beautifulsoup4, and configured worker credentials. Separate builds for Jellyfin 10.11.11 and 12.x. Source: https://github.com/mcollard0/finamp-lyrics",
+    "versions": [
+      {
+        "version": "2.0.0.0",
+        "targetAbi": "12.0",
+        "sourceUrl": "https://github.com/mcollard0/finamp-lyrics/releases/download/plugin-v2.0.0.0/finamp-lyrics-2.0.0.0.zip",
+        "checksum": "a7d3a4b9285a5886931621fd79659e23",
+        "timestamp": "2026-10-04 14:12:32",
+        "changelog": "Separate Jellyfin 10.11/.NET 9 and 12.x/.NET 10 builds; modern Jellyfin authentication and upgrade-safe bundled workers. Migration and lyric-upload tests on 12.0 and 12.1."
+      },
+      {
+        "version": "1.0.3.0",
+        "targetAbi": "10.11.11",
+        "sourceUrl": "https://github.com/mcollard0/finamp-lyrics/releases/download/plugin-v1.0.3.0/finamp-lyrics-1.0.3.0.zip",
+        "checksum": "36bf1bfb2065d02dd3d23eac614e3fcd",
+        "timestamp": "2026-10-04 14:12:31",
+        "changelog": "Separate Jellyfin 10.11/.NET 9 and 12.x/.NET 10 builds; modern Jellyfin authentication and upgrade-safe bundled workers. Migration and lyric-upload tests on 12.0 and 12.1."
+      }
+    ]
+  }
+]

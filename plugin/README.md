@@ -111,4 +111,6 @@ New lyric files do not force Finamp to invalidate metadata already held in memor
 
 Developer: [mcollard0](https://github.com/mcollard0). [Source and issues](https://github.com/mcollard0/finamp-lyrics). MIT licensed.
 
-See [catalog setup](CATALOG_INSTALL.md) and [release and listing steps](RELEASE.md). The repository URL described there becomes usable after a release and manifest are published.
+See [catalog setup](CATALOG_INSTALL.md) and [release and listing steps](RELEASE.md).
+The published catalog is https://raw.githubusercontent.com/mcollard0/finamp-lyrics/main/manifest.json.
+Jellyfin selects the compatible package for 10.11.11 or 12.x.

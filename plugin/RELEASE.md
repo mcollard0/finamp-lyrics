@@ -108,7 +108,7 @@ require user testing. The existing public draft 1.0.1.0 assets are unchanged.
 ## Publish after user testing
 
 Review the files and ZIP contents, then commit with your own message and push
-the reviewed source. The commands below are examples; none has been executed.
+the reviewed source. The commands below show the publication workflow.
 Use the reviewed source commit SHA for `--target` in place of `main` if needed.
 
 ```bash

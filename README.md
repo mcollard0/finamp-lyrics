@@ -155,3 +155,10 @@ Copy `config.example.json` to `config.json` for the service runner. Set the cred
 ## Plugin distribution
 
 Developed by [mcollard0](https://github.com/mcollard0). See [catalog installation](plugin/CATALOG_INSTALL.md) and [release preparation](plugin/RELEASE.md). Separate Linux plugin builds support Jellyfin 10.11.11 (.NET 9) and 12.x (.NET 10). See [Jellyfin 12 upgrade testing](plugin/JF12.md).
+
+Published packages: [1.0.3.0 for Jellyfin 10.11.11](https://github.com/mcollard0/finamp-lyrics/releases/tag/plugin-v1.0.3.0) and [2.0.0.0 for Jellyfin 12.x](https://github.com/mcollard0/finamp-lyrics/releases/tag/plugin-v2.0.0.0).
+Add this catalog URL in Jellyfin Dashboard → Plugins → Repositories; Jellyfin selects the compatible build:
+
+```text
+https://raw.githubusercontent.com/mcollard0/finamp-lyrics/main/manifest.json
+```
